@@ -26,7 +26,7 @@ module Songify
       end
 
       # parameter could be song id
-      def get_a_song(id)
+      def find(id)
         result = @db.exec(%q[
           SELECT * FROM songs
           WHERE id = $1
@@ -36,7 +36,7 @@ module Songify
       end
 
       # no parameter needed
-      def get_all_songs
+      def all
         result = @db.exec("SELECT * FROM songs")
         result.map { |r| build_song(r) }
       end
@@ -53,7 +53,7 @@ module Songify
       #   song.instance_variable_set :@id, result.first['id'].to_i
       # end
 
-      def save_song(*songs)
+      def save(*songs)
         base = "INSERT INTO songs (title, artist, album) values "
         values = songs.map do |s|
           "('#{s.title}', '#{s.artist}', '#{s.album}')"
@@ -66,7 +66,7 @@ module Songify
       end
 
       # parameter could be song id
-      def delete_a_song(id)
+      def delete(id)
         @db.exec(%q[
           DELETE FROM songs
           WHERE id = $1

@@ -1,0 +1,31 @@
+<!-- Next level styling coming up...
+     You're not ready for this. -->
+
+<% if !songs.empty? %>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+    }
+  </style>
+
+  <table>
+    <tr>
+      <th colspan="4"><br><h3>Songs</h3></th>
+    </tr>
+    <tr>
+      <th>Artist</th>
+      <th>Title</th>
+    </tr>
+    <% songs.each do |song| %>
+    <tr>
+      <td><%= song.artist %></td>
+      <td><%= song.title %></td>
+      <td><a href='/show/<%= song.id %>'>View</a></td>
+      <td><a href='/song/delete/<%= song.id %>'>Delete</a></td>
+    </tr>
+    <% end %>
+  </table>
+<% else %>
+  No songs in database!
+<% end %>
+

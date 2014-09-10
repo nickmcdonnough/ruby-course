@@ -1,11 +1,11 @@
 module Songify
   # songs repo setter method
-  def self.songs_repo=(x)
+  def self.songs=(x)
     @songs_repo = x
   end
 
   # songs repo getter method
-  def self.songs_repo
+  def self.songs
     @songs_repo
   end
 end
@@ -13,4 +13,4 @@ end
 require_relative 'songify/entities/song.rb'
 require_relative 'songify/repositories/songs.rb'
 
-Songify.songs_repo = Songify::Repositories::Songs.new
+Songify.songs = Songify::Repositories::Songs.new
