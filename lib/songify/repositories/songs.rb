@@ -4,8 +4,8 @@ require 'pry-byebug'
 module Songify
   module Repositories
     class Songs
-      def initialize
-        @db = PG.connect(host:'localhost', dbname:'songify')
+      def initialize(dbname)
+        @db = PG.connect(host:'localhost', dbname: dbname)
         build_table
       end
 
@@ -20,7 +20,7 @@ module Songify
         ])
       end
 
-      def drop_table
+      def rebuild 
         @db.exec("DROP TABLE songs")
         build_table
       end

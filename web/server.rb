@@ -1,7 +1,7 @@
 require 'sinatra'
 require 'sinatra/reloader'
 require 'pry-byebug'
-require_relative 'lib/songify.rb'
+require_relative '../lib/songify.rb'
 
 class Songify::Server < Sinatra::Application
 
@@ -12,10 +12,6 @@ class Songify::Server < Sinatra::Application
 
   # index
   get '/' do
-    redirect to '/index'
-  end
-  
-  get '/index' do
     erb :index, :locals => {title: 'Nick\'s Song Manager'}
   end
   
