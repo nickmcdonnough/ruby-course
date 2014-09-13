@@ -7,6 +7,9 @@ describe Songify::Server do
     Songify::Server.new
   end
 
+  #############################################
+  # Basic testing of index endpoint
+  #############################################
   describe 'get /' do
     it 'loads the homepage' do
       get '/'
@@ -19,6 +22,9 @@ describe Songify::Server do
     end
   end
 
+  #############################################
+  # Testing of 'songs' resource endpoints
+  #############################################
   describe 'get /songs' do
     context 'when there are no songs saved' do
       it 'receives \'no songs\' message' do
@@ -45,17 +51,87 @@ describe Songify::Server do
   end
 
   describe 'post /songs' do
-    xit 'can save songs' do
-      post '/songs', {} # params hash
+    it 'can save songs' do
+      song_data = {
+        'title' => 'Stranger to Stability',
+        'artist' => 'Dustin Zahn',
+        'album' => 'Stranger'
+      }
+
+      post '/songs', song_data # params hash
       song_list = Songify.songs.all
-      expect(song_list.count).to eq(3)
+      expect(song_list.count).to eq(1)
     end
   end
 
   describe 'get /songs/delete' do
-    xit 'can delete saved songs by id' do
+    it 'can delete saved songs by id' do
+      song_data = {
+        'title' => 'Stranger to Stability',
+        'artist' => 'Dustin Zahn',
+        'album' => 'Stranger'
+      }
+
+      post '/songs', song_data # params hash
       song_list = Songify.songs.all
-      expect(song_list.count).to eq(2)
+      expect(song_list.count).to eq(1)
+
+      get '/songs/delete/1'
+      song_list = Songify.songs.all
+      expect(song_list.count).to eq(0)
+    end
+  end
+
+  #############################################
+  # Testing of 'genres' resource endpoints
+  #############################################
+
+  describe 'get /genres' do
+    context 'when there are no genres saved' do
+      it 'receives \'no genres\' message' do
+        get '/genres'
+        expect(last_response.body).to include 'No genres'
+      end
+    end
+
+    context 'when there are genres saved' do
+      it 'can view all genres' do
+        genre = Songify::Genre.new('Techno')
+        Songify.genres.save(genre)
+        get '/genres'
+        expect(last_response.body).to include 'Techno'
+      end
+    end
+  end
+
+  describe 'get /genres/new' do
+    it 'displays the correct form' do
+      get '/genres/new'
+      expect(last_response.body).to include 'form', 'action', 'method'
+    end
+  end
+
+  describe 'post /genres' do
+    it 'can save genres' do
+      genre_data = {'title' => 'Stranger to Stability'}
+
+      post '/genres', genre_data # params hash
+      genre_list = Songify.genres.all
+      expect(genre_list.count).to eq(1)
+    end
+  end
+
+  describe 'get /genres/delete' do
+    it 'can delete saved genres by id' do
+      genre_data = {'title' => 'Stranger to Stability'}
+
+      post '/genres', genre_data # params hash
+      genre_list = Songify.genres.all
+      expect(genre_list.count).to eq(1)
+
+      get '/genres/delete/1'
+      genre_list = Songify.genres.all
+      expect(genre_list.count).to eq(0)
     end
   end
 end

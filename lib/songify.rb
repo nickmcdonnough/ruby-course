@@ -12,7 +12,7 @@ module Songify
   end
 
   def self.genres
-    @genres_rep
+    @genres_repo
   end
 end
 

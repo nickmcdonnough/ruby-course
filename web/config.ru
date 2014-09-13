@@ -1,3 +1,3 @@
 require './server'
-Songify::Repos.adapter = 'songify_dev'
+Songify::Repositories::Songs.new('songify_dev')
 run Songify::Server

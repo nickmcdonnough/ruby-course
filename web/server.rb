@@ -14,11 +14,15 @@ class Songify::Server < Sinatra::Application
   get '/' do
     erb :index, :locals => {title: 'Nick\'s Song Manager'}
   end
-  
+
+  ########################################################
+  # All endpoints for the 'song' resource
+  ########################################################
+
   # show
   get '/songs' do
     songs = Songify.songs.all
-    erb :show, :locals => {
+    erb :songs, :locals => {
       title: 'All Songs | NSM',
       songs: songs
     }
@@ -35,19 +39,64 @@ class Songify::Server < Sinatra::Application
   
   # new
   get '/songs/new' do
-    erb :new, :locals => {title: 'New Song | NSM'}
+    erb :new_song, :locals => {title: 'New Song | NSM'}
   end
   
   # create
-  post '/songs/create' do
+  post '/songs' do
     song = Songify::Song.new(params['title'], params['artist'], params['album'])
     Songify.songs.save(song)
-    redirect to '/songs/show/' + song.id.to_s
+    redirect to '/songs/' + song.id.to_s
   end
   
   # delete
   get '/songs/delete/:id' do
     Songify.songs.delete(params[:id])
-    redirect to '/songs/show'
+    redirect to '/songs'
   end
+
+  ########################################################
+  # All endpoints for the 'genre' resource
+  ########################################################
+
+  # show
+  get '/genres' do
+    genres = Songify.genres.all
+    erb :genres, :locals => {
+      title: 'All Genres | NSM',
+      genres: genres
+    }
+  end
+
+  # show
+  get '/genres/:id' do
+    genre = Songify.genres.find(params[:id])
+    erb :genre, :locals => {
+      title: 'Song: ' + genre.name + ' | NSM',
+      genre: genre
+    }
+  end
+
+  # new
+  get '/genres/new' do
+    erb :new_genre, :locals => {title: 'New Genre | NSM'}
+  end
+
+  # create
+  post '/genres' do
+    genre = Songify::Genre.new(params['name'])
+    Songify.genres.save(genre)
+    redirect to '/genres/' + song.id.to_s
+  end
+
+  # delete
+  get '/genres/delete/:id' do
+    Songify.genres.delete(params[:id])
+    redirect to '/genres'
+  end
+
+  ########################################################
+  # Endpoints for working with songs and genres
+  ########################################################
+
 end

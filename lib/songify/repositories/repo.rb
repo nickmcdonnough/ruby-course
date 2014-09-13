@@ -29,8 +29,8 @@ module Songify
 
     def self.drop_tables
       @__db_conn.exec(%q[
-        DROP TABLE songs;
-        DROP TABLE genres;
+        DROP TABLE IF EXISTS songs;
+        DROP TABLE IF EXISTS genres;
       ])
     end
   end
