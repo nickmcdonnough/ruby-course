@@ -1,33 +1,9 @@
-require 'pg'
-require 'pry-byebug'
-
 module Songify
-  module Repositories
+  module Repos
     class Songs
-      def initialize(dbname)
-        @db = PG.connect(host:'localhost', dbname: dbname)
-        build_table
-      end
-
-      def build_table
-        @db.exec(%q[
-          CREATE TABLE IF NOT EXISTS songs(
-            id serial,
-            title text,
-            artist text,
-            album text
-          )
-        ])
-      end
-
-      def rebuild 
-        @db.exec("DROP TABLE songs")
-        build_table
-      end
-
       # parameter could be song id
       def find(id)
-        result = @db.exec(%q[
+        result = Songify::Repos.adapter.exec(%q[
           SELECT * FROM songs
           WHERE id = $1
         ], [id])
@@ -37,14 +13,14 @@ module Songify
 
       # no parameter needed
       def all
-        result = @db.exec("SELECT * FROM songs")
+        result = Songify::Repos.adapter.exec("SELECT * FROM songs")
         result.map { |r| build_song(r) }
       end
 
       # old save a song method
       # parameter should be a song object
       # def save_a_song(song)
-      #   result = @db.exec(%q[
+      #   result = Songify::Repos.adapter.exec(%q[
       #     INSERT INTO songs (title, artist, album)
       #     VALUES ($1, $2, $3)
       #     RETURNING id
@@ -59,7 +35,7 @@ module Songify
           "('#{s.title}', '#{s.artist}', '#{s.album}')"
         end
         sql = base + values.join(', ') + " RETURNING id"
-        result = @db.exec(sql)
+        result = Songify::Repos.adapter.exec(sql)
         songs.each_with_index do |song, i|
           song.instance_variable_set :@id, result[i]['id'].to_i
         end
@@ -67,7 +43,7 @@ module Songify
 
       # parameter could be song id
       def delete(id)
-        @db.exec(%q[
+        Songify::Repos.adapter.exec(%q[
           DELETE FROM songs
           WHERE id = $1
         ], [id])

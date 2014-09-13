@@ -1,9 +1,15 @@
 require_relative '../lib/songify.rb'
 
-Songify.songs = Songify::Repositories::Songs.new('songify_test')
+# next line establishes the db connection
+Songify::Repos.adapter = 'songify_test'
+
+# the next two lines assign the repositories
+Songify.songs = Songify::Repos::Songs.new
+Songify.genres = Songify::Repos::Genres.new
 
 RSpec.configure do |config|
   config.before(:each) do
-    Songify.songs.rebuild
+    Songify::Repos.drop_tables
+    Songify::Repos.build_tables
   end
 end

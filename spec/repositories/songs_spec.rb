@@ -1,10 +1,6 @@
 require_relative '../spec_helper.rb'
 
-describe Songify::Repositories::Songs do
-  after do
-    Songify.songs.drop_table
-  end
-
+describe Songify::Repos::Songs do
   it 'can save a song' do
     song = Songify::Song.new('fake_title', 'fake_artist', 'fake_album')
     expect(song.id).to be_nil

@@ -53,6 +53,7 @@ PLATFORMS
 DEPENDENCIES
   pg
   pry-byebug
+  rack-test
   rspec (~> 2.14.1)
   sinatra
   sinatra-contrib
