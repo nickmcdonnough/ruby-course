@@ -1,0 +1,29 @@
+<!-- Next level styling coming up...
+     You're not ready for this. -->
+
+<% if !genres.empty? %>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+    }
+  </style>
+  <table>
+    <tr>
+      <th colspan="4"><br><h3>Genre</h3></th>
+    </tr>
+    <tr>
+      <th>Artist</th>
+      <th>Title</th>
+    </tr>
+    <% genres.each do |genre| %>
+    <tr>
+      <td><%= genre.name %></td>
+      <td><a href='/songs/genre/<%= genre.id %>'>Songs</a></td>
+      <td><a href='/genres/delete/<%= genre.id %>'>Delete</a></td>
+    </tr>
+    <% end %>
+  </table>
+<% else %>
+  No genres in database!
+<% end %>
+

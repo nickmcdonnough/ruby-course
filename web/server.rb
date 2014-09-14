@@ -29,7 +29,7 @@ class Songify::Server < Sinatra::Application
   end
   
   # show
-  get '/songs/:id' do
+  get '/songs/s/:id' do
     song = Songify.songs.find(params[:id])
     erb :song, :locals => {
       title: 'Song: ' + song.title + ' | NSM',
@@ -39,14 +39,20 @@ class Songify::Server < Sinatra::Application
   
   # new
   get '/songs/new' do
-    erb :new_song, :locals => {title: 'New Song | NSM'}
+    genres = Songify.genres.all
+    erb :new_song, :locals => {
+      title: 'New Song | NSM',
+      genres: genres
+    }
   end
   
   # create
   post '/songs' do
-    song = Songify::Song.new(params['title'], params['artist'], params['album'])
+    title, artist = params['title'], params['artist']
+    album, genre_id = params['album'], params['genre']
+    song = Songify::Song.new(title, artist, album, genre_id)
     Songify.songs.save(song)
-    redirect to '/songs/' + song.id.to_s
+    redirect to '/songs/s/' + song.id.to_s
   end
   
   # delete
@@ -69,7 +75,7 @@ class Songify::Server < Sinatra::Application
   end
 
   # show
-  get '/genres/:id' do
+  get '/genres/g/:id' do
     genre = Songify.genres.find(params[:id])
     erb :genre, :locals => {
       title: 'Song: ' + genre.name + ' | NSM',
@@ -79,14 +85,18 @@ class Songify::Server < Sinatra::Application
 
   # new
   get '/genres/new' do
-    erb :new_genre, :locals => {title: 'New Genre | NSM'}
+    genres = Songify.genres.all
+    erb :new_genre, :locals => {
+      title: 'New Genre | NSM',
+      genres: genres
+    }
   end
 
   # create
   post '/genres' do
     genre = Songify::Genre.new(params['name'])
     Songify.genres.save(genre)
-    redirect to '/genres/' + song.id.to_s
+    redirect to '/genres/g/' + genre.id.to_s
   end
 
   # delete
@@ -99,4 +109,13 @@ class Songify::Server < Sinatra::Application
   # Endpoints for working with songs and genres
   ########################################################
 
+  get '/songs/genre/:id' do
+    genre = Songify.genres.find(params[:id].to_i)
+    songs = Songify.songs.find_by_genre(params[:id].to_i)
+    erb :songs, :locals => {
+      title: genre.name + ' Songs | NSM',
+      songs: songs,
+      genre: genre
+    }
+  end
 end

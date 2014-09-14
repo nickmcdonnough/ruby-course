@@ -1,0 +1,13 @@
+<h3>New Song</h3>
+
+<form action='/songs' method='post'>
+  <input type='text' name='title' placeholder='Title'><br />
+  <input type='text' name='artist' placeholder='Artists'><br />
+  <input type='text' name='album' placeholder='Album'><br />
+  <select name='genre'>
+    <% genres.each do |genre| %>
+      <option value='<%= genre.id %>'><%= genre.name %></option>
+    <% end %>
+  </select><br />
+  <input type='submit' value='Save'>
+</form>

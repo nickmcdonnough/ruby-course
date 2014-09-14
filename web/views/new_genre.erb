@@ -1,0 +1,14 @@
+<h3>New Genre</h3>
+
+<form action='/genres' method='post'>
+  <input type='text' name='name' placeholder='Name'><br />
+  <input type='submit' name='Save'>
+</form>
+
+<br /><br />
+
+<% if defined? genres %>
+  <% genres.each do |genre| %>
+    <%= genre.name %>
+  <% end %>
+<% end %>

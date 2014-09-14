@@ -10,7 +10,11 @@
 
   <table>
     <tr>
-      <th colspan="4"><br><h3>Songs</h3></th>
+      <th colspan="4"><br>
+        <h3>
+          <%= defined?(genre) ? "#{genre.name} Songs" : "Songs" %>
+      </h3>
+    </th>
     </tr>
     <tr>
       <th>Artist</th>
@@ -20,12 +24,12 @@
     <tr>
       <td><%= song.artist %></td>
       <td><%= song.title %></td>
-      <td><a href='/show/<%= song.id %>'>View</a></td>
+      <td><a href='/songs/s/<%= song.id %>'>View</a></td>
       <td><a href='/songs/delete/<%= song.id %>'>Delete</a></td>
     </tr>
     <% end %>
   </table>
 <% else %>
-  No songs in database!
+  <%= defined?(genre) ? "No #{genre.name} songs in database!" : "No songs in database!" %>
 <% end %>
 

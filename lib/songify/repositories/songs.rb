@@ -1,6 +1,14 @@
 module Songify
   module Repos
     class Songs
+      def build_song(data)
+        title, artist = data['title'], data['artist']
+        album, genre_id = data['album'], data['genre_id']
+        x = Songify::Song.new(title, artist, album, genre_id)
+        x.instance_variable_set :@id, data['id'].to_i
+        x
+      end
+
       # parameter could be song id
       def find(id)
         result = Songify::Repos.adapter.exec(%q[
@@ -30,11 +38,12 @@ module Songify
       # end
 
       def save(*songs)
-        base = "INSERT INTO songs (title, artist, album) values "
+        base = "INSERT INTO songs (title, artist, album, genre_id) values "
         values = songs.map do |s|
-          "('#{s.title}', '#{s.artist}', '#{s.album}')"
+          "('#{s.title}', '#{s.artist}', '#{s.album}', #{s.genre_id})"
         end
         sql = base + values.join(', ') + " RETURNING id"
+        puts sql
         result = Songify::Repos.adapter.exec(sql)
         songs.each_with_index do |song, i|
           song.instance_variable_set :@id, result[i]['id'].to_i
@@ -49,10 +58,11 @@ module Songify
         ], [id])
       end
 
-      def build_song(data)
-        x = Songify::Song.new(data['title'], data['artist'], data['album'])
-        x.instance_variable_set :@id, data['id'].to_i
-        x
+      # Songs by genre
+      def find_by_genre(id)
+        sql = 'SELECT * FROM songs WHERE genre_id = $1'
+        result = Songify::Repos.adapter.exec(sql, [id])
+        result.map { |row| build_song(row) }
       end
     end
   end
