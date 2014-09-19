@@ -1,27 +1,46 @@
 module Songify
   module Repos
     class Songs
+      def select_all
+        <<-SQL
+           SELECT
+             s.id
+             , s.title
+             , s.artist_id
+             , s.album
+             , s.genre_id
+             , a.name as artist
+             , g.name as genre
+           FROM songs s
+           JOIN artists a
+           ON s.artist_id = a.id
+           JOIN genres g
+           ON s.artist_id = g.id
+        SQL
+      end
+
       def build_song(data)
-        title, artist = data['title'], data['artist']
-        album, genre_id = data['album'], data['genre_id']
-        x = Songify::Song.new(title, artist, album, genre_id)
+        title, album = data['title'], data['album']
+        artist, artist_id = data['artist'], data['artist_id']
+        genre, genre_id = data['genre'], data['genre_id']
+
+        x = Songify::Song.new(title, artist_id, album, genre_id)
         x.instance_variable_set :@id, data['id'].to_i
+        x.artist = artist
+        x.genre = genre
         x
       end
 
       # parameter could be song id
       def find(id)
-        result = Songify::Repos.adapter.exec(%q[
-          SELECT * FROM songs
-          WHERE id = $1
-        ], [id])
-
+        sql = select_all + "WHERE s.id = $1"
+        result = Songify::Repos.adapter.exec(sql, [id])
         build_song(result.first)
       end
 
       # no parameter needed
       def all
-        result = Songify::Repos.adapter.exec("SELECT * FROM songs")
+        result = Songify::Repos.adapter.exec(select_all)
         result.map { |r| build_song(r) }
       end
 
@@ -60,7 +79,14 @@ module Songify
 
       # Songs by genre
       def find_by_genre(id)
-        sql = 'SELECT * FROM songs WHERE genre_id = $1'
+        sql = select_all + "WHERE genre_id = $1"
+        result = Songify::Repos.adapter.exec(sql, [id])
+        result.map { |row| build_song(row) }
+      end
+
+      # Songs by artist
+      def find_by_artist(id)
+        sql = select_all + "WHERE artist_id = $1"
         result = Songify::Repos.adapter.exec(sql, [id])
         result.map { |row| build_song(row) }
       end

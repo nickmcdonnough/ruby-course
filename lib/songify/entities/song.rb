@@ -1,6 +1,7 @@
 module Songify
   class Song
     attr_reader :title, :artist_id, :album, :genre_id, :id
+    attr_accessor :artist, :genre
 
     def initialize(title, artist_id, album, genre_id)
       @title = title

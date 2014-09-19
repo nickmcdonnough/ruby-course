@@ -1,7 +1,7 @@
 <!-- Next level styling coming up...
      You're not ready for this. -->
 
-<% if !genres.empty? %>
+<% if !artists.empty? %>
   <style>
     table, th, td {
       border: 1px solid black;
@@ -14,15 +14,15 @@
     <tr>
       <th>Name</th>
     </tr>
-    <% genres.each do |genre| %>
+    <% artists.each do |artist| %>
     <tr>
-      <td><%= genre.name %></td>
-      <td><a href='/songs/genre/<%= genre.id %>'>Songs</a></td>
-      <td><a href='/genres/delete/<%= genre.id %>'>Delete</a></td>
+      <td><%= artist.name %></td>
+      <td><a href='/songs/artist/<%= artist.id %>'>Songs</a></td>
+      <td><a href='/artists/delete/<%= artist.id %>'>Delete</a></td>
     </tr>
     <% end %>
   </table>
 <% else %>
-  No genres in database!
+  No artists in database!
 <% end %>
 

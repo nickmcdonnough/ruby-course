@@ -1,13 +1,26 @@
 <h3>New Song</h3>
 
 <form action='/songs' method='post'>
-  <input type='text' name='title' placeholder='Title'><br />
-  <input type='text' name='artist' placeholder='Artists'><br />
-  <input type='text' name='album' placeholder='Album'><br />
-  <select name='genre'>
+  <input type='text' name='title' placeholder='Title'>
+ 
+
+  <input type='text' name='artist' placeholder='Artists'>
+
+  <select name='artist_id'>
+    <% artists.each do |artist| %>
+      <option value='<%= artist.id %>'><%= artist.name %></option>
+    <% end %>
+  </select><br />
+
+  <input type='text' name='album' placeholder='Album'>
+
+  <input type='text' name='genre' placeholder='Genre'>
+
+  <select name='genre_id'>
     <% genres.each do |genre| %>
       <option value='<%= genre.id %>'><%= genre.name %></option>
     <% end %>
-  </select><br />
+  </select><br /><br />
+
   <input type='submit' value='Save'>
 </form>

@@ -43,19 +43,38 @@ class Songify::Server < Sinatra::Application
   
   # new
   get '/songs/new' do
+    artists = Songify.artists.all
     genres = Songify.genres.all
     erb :'songs/new', :locals => {
       title: 'New Song | NSM',
+      artists: artists,
       genres: genres
     }
   end
   
   # create
   post '/songs' do
-    title, artist = params['title'], params['artist']
-    album, genre_id = params['album'], params['genre']
-    song = Songify::Song.new(title, artist, album, genre_id)
+    title, album = params['title'], params['album']
+    artist, artist_id = params['artist'], params['artist_id']
+    genre, genre_id = params['genre'], params['genre_id']
+
+    if genre.empty?
+      genre = Songify.genres.find(genre_id.to_i)
+    else
+      genre = Songify::Genre.new(genre)
+      Songify.genres.save(genre)
+    end
+
+    if artist.empty?
+      artist = Songify.artists.find(artist_id.to_i)
+    else
+      artist = Songify::Artist.new(artist)
+      Songify.artists.save(artist)
+    end
+
+    song = Songify::Song.new(title, artist.id, album, genre.id)
     Songify.songs.save(song)
+
     redirect to '/songs/s/' + song.id.to_s
   end
   
@@ -117,6 +136,60 @@ class Songify::Server < Sinatra::Application
   get '/genres/delete/:id' do
     Songify.genres.delete(params[:id])
     redirect to '/genres'
+  end
+
+  ########################################################
+  # All endpoints for the 'artist' resource
+  ########################################################
+
+  # show
+  get '/artists' do
+    artists = Songify.artists.all
+    erb :'artists/index', :locals => {
+      title: 'All Genres | NSM',
+      artists: artists
+    }
+  end
+
+  # show
+  get '/artists/a/:id' do
+    artist = Songify.artists.find(params[:id])
+    erb :'artists/show', :locals => {
+      title: 'Song: ' + artist.name + ' | NSM',
+      artist: artist
+    }
+  end
+
+  # new
+  get '/artists/new' do
+    artists = Songify.artists.all
+    erb :'artists/new', :locals => {
+      title: 'New Genre | NSM',
+      artists: artists
+    }
+  end
+
+  # create
+  # notice the exception handling code here.
+  # this is in case someone enteres a value
+  # for a artist that already exists in the db.
+  # our database is set up with a unique
+  # constraint on the artists(name) column.
+  post '/artists' do
+    begin
+      artist = Songify::Genre.new(params['name'])
+      Songify.artists.save(artist)
+      redirect to '/artists/a/' + artist.id.to_s
+    rescue PG::Error => e
+      flash[:alert] = Songify::Error.process(e)
+      redirect to '/artists/new'
+    end
+  end
+
+  # delete
+  get '/artists/delete/:id' do
+    Songify.artists.delete(params[:id])
+    redirect to '/artists'
   end
 
   ########################################################
