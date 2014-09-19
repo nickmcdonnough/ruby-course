@@ -41,7 +41,7 @@ module Songify
       end
 
       def delete(id)
-        Songify::Repos.adapter.exec('DELETE FROM GENRES WHERE id = $1', [id])
+        Songify::Repos.adapter.exec('DELETE FROM genres WHERE id = $1', [id])
       end
 
       def build_genre(data)

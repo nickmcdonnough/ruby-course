@@ -35,7 +35,12 @@ describe Songify::Server do
 
     context 'when there are songs saved' do
       it 'can view all songs' do
-        song = Songify::Song.new('Percolator', 'Cajmere', 'Percolator EP')
+        artist = Songify::Artist.new('Cajmere')
+        Songify.artists.save(artist)
+        genre = Songify::Artist.new('Chicago House')
+        Songify.genres.save(genre)
+        song = Songify::Song.new('Percolator', 1, 'Percolator EP', 1)
+
         Songify.songs.save(song)
         get '/songs'
         expect(last_response.body).to include 'Percolator', 'Cajmere'
@@ -52,10 +57,16 @@ describe Songify::Server do
 
   describe 'post /songs' do
     it 'can save songs' do
+      artist = Songify::Artist.new('Dustin Zahn')
+      Songify.artists.save(artist)
+      genre = Songify::Artist.new('Techno')
+      Songify.genres.save(genre)
+
       song_data = {
         'title' => 'Stranger to Stability',
-        'artist' => 'Dustin Zahn',
-        'album' => 'Stranger'
+        'artist' => 1,
+        'album' => 'Stranger',
+        'genre' => 1
       }
 
       post '/songs', song_data # params hash
@@ -66,10 +77,16 @@ describe Songify::Server do
 
   describe 'get /songs/delete' do
     it 'can delete saved songs by id' do
+      artist = Songify::Artist.new('Dustin Zahn')
+      Songify.artists.save(artist)
+      genre = Songify::Artist.new('Techno')
+      Songify.genres.save(genre)
+
       song_data = {
         'title' => 'Stranger to Stability',
-        'artist' => 'Dustin Zahn',
-        'album' => 'Stranger'
+        'artist' => 1,
+        'album' => 'Stranger',
+        'genre' => 1
       }
 
       post '/songs', song_data # params hash

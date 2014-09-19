@@ -38,9 +38,9 @@ module Songify
       # end
 
       def save(*songs)
-        base = "INSERT INTO songs (title, artist, album, genre_id) values "
+        base = "INSERT INTO songs (title, artist_id, album, genre_id) values "
         values = songs.map do |s|
-          "('#{s.title}', '#{s.artist}', '#{s.album}', #{s.genre_id})"
+          "('#{s.title}', '#{s.artist_id}', '#{s.album}', #{s.genre_id})"
         end
         sql = base + values.join(', ') + " RETURNING id"
         puts sql

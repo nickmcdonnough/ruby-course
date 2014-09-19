@@ -9,7 +9,8 @@ class Songify::Server < Sinatra::Application
   #if using vagrant uncomment the line with 'set bind...'
   configure do
     # set :bind, '0.0.0.0'
-    set :sessions, true
+    enable :sessions
+    set :session_secret, '089e09w'
     use Rack::Flash
   end
 

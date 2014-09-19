@@ -1,12 +1,12 @@
 require_relative '../spec_helper.rb'
 
 describe Songify::Song do
-  let(:song) { Songify::Song.new('fake_title', 'fake_artist', 'fake_album') }
+  let(:song) { Songify::Song.new('fake_title', 0, 'fake_album', 2) }
 
   it 'will initialize with 3 attributes' do
     #song = Songify::Song.new('fake_title', 'fake_artist', 'fake_album')
     expect(song.title).to eq('fake_title')
-    expect(song.artist).to eq('fake_artist')
+    expect(song.artist_id).to eq(0)
     expect(song.album).to eq('fake_album')
   end
 end
