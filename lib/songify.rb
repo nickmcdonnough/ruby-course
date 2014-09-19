@@ -23,3 +23,4 @@ require_relative 'songify/repositories/repo.rb'
 require_relative 'songify/repositories/songs.rb'
 require_relative 'songify/repositories/genres.rb'
 
+require_relative 'songify/error.rb'

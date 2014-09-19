@@ -1,7 +1,11 @@
 <h3>New Genre</h3>
 
+<% if flash[:alert] %>
+  Alert: <%= flash[:alert] %><br />
+<% end %>
+
 <form action='/genres' method='post'>
-  <input type='text' name='name' placeholder='Name'><br />
+  <input type='text' name='name' placeholder='Name'><br /><br />
   <input type='submit' name='Save'>
 </form>
 
@@ -9,6 +13,8 @@
 
 <% if defined? genres %>
   <% genres.each do |genre| %>
-    <%= genre.name %>
+    <%= genre.name %><br />
   <% end %>
 <% end %>
+
+

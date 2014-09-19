@@ -3,6 +3,7 @@ ruby '2.0.0'
 
 gem 'pg'
 gem 'sinatra'
+gem 'rack-flash3'
 
 group :development do
   gem 'pry-byebug'

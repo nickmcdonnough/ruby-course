@@ -1,14 +1,17 @@
 require 'sinatra'
+require 'rack-flash'
 require 'sinatra/reloader'
 require 'pry-byebug'
 require_relative '../lib/songify.rb'
 
 class Songify::Server < Sinatra::Application
 
-  # if using vagrant uncomment the following 3 lines
-  # configure do
-  #   set :bind, '0.0.0.0'
-  # end
+  #if using vagrant uncomment the line with 'set bind...'
+  configure do
+    # set :bind, '0.0.0.0'
+    set :sessions, true
+    use Rack::Flash
+  end
 
   # index
   get '/' do
@@ -22,7 +25,7 @@ class Songify::Server < Sinatra::Application
   # show
   get '/songs' do
     songs = Songify.songs.all
-    erb :songs, :locals => {
+    erb :'songs/index', :locals => {
       title: 'All Songs | NSM',
       songs: songs
     }
@@ -31,7 +34,7 @@ class Songify::Server < Sinatra::Application
   # show
   get '/songs/s/:id' do
     song = Songify.songs.find(params[:id])
-    erb :song, :locals => {
+    erb :'songs/show', :locals => {
       title: 'Song: ' + song.title + ' | NSM',
       song: song
     }
@@ -40,7 +43,7 @@ class Songify::Server < Sinatra::Application
   # new
   get '/songs/new' do
     genres = Songify.genres.all
-    erb :new_song, :locals => {
+    erb :'songs/new', :locals => {
       title: 'New Song | NSM',
       genres: genres
     }
@@ -68,7 +71,7 @@ class Songify::Server < Sinatra::Application
   # show
   get '/genres' do
     genres = Songify.genres.all
-    erb :genres, :locals => {
+    erb :'genres/index', :locals => {
       title: 'All Genres | NSM',
       genres: genres
     }
@@ -77,7 +80,7 @@ class Songify::Server < Sinatra::Application
   # show
   get '/genres/g/:id' do
     genre = Songify.genres.find(params[:id])
-    erb :genre, :locals => {
+    erb :'genres/show', :locals => {
       title: 'Song: ' + genre.name + ' | NSM',
       genre: genre
     }
@@ -86,17 +89,27 @@ class Songify::Server < Sinatra::Application
   # new
   get '/genres/new' do
     genres = Songify.genres.all
-    erb :new_genre, :locals => {
+    erb :'genres/new', :locals => {
       title: 'New Genre | NSM',
       genres: genres
     }
   end
 
   # create
+  # notice the exception handling code here.
+  # this is in case someone enteres a value
+  # for a genre that already exists in the db.
+  # our database is set up with a unique
+  # constraint on the genres(name) column.
   post '/genres' do
-    genre = Songify::Genre.new(params['name'])
-    Songify.genres.save(genre)
-    redirect to '/genres/g/' + genre.id.to_s
+    begin
+      genre = Songify::Genre.new(params['name'])
+      Songify.genres.save(genre)
+      redirect to '/genres/g/' + genre.id.to_s
+    rescue PG::Error => e
+      flash[:alert] = Songify::Error.process(e)
+      redirect to '/genres/new'
+    end
   end
 
   # delete
@@ -112,7 +125,7 @@ class Songify::Server < Sinatra::Application
   get '/songs/genre/:id' do
     genre = Songify.genres.find(params[:id].to_i)
     songs = Songify.songs.find_by_genre(params[:id].to_i)
-    erb :songs, :locals => {
+    erb :'songs/index', :locals => {
       title: genre.name + ' Songs | NSM',
       songs: songs,
       genre: genre
