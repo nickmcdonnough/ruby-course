@@ -2,15 +2,32 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'rest-client'
 require 'json'
+require 'pry-byebug'
+
+require_relative 'lib/petshopserver.rb'
 
 # #
 # This is our only html view...
 #
-get '/' do
-  if session[:user_id]
-    # TODO: Grab user from database
-    @current_user = $sample_user
+
+enable :sessions
+
+helpers do
+  def get_current_user id
+    user = PSS::Users.find id
+    user[:cats] = PSS::Pets.adopted_by user['id'], kind: 'cats'
+    user[:dogs] = PSS::Pets.adopted_by user['id'], kind: 'dogs'
+    user
   end
+end
+
+before do
+  if session[:user_id]
+    @current_user = get_current_user session[:user_id]
+  end
+end
+
+get '/' do
   erb :index
 end
 
@@ -19,7 +36,8 @@ end
 #
 get '/shops' do
   headers['Content-Type'] = 'application/json'
-  RestClient.get("http://pet-shop.api.mks.io/shops")
+  all_shops = PSS::Shops.all
+  all_shops.to_json
 end
 
 post '/signin' do
@@ -28,69 +46,48 @@ post '/signin' do
   username = params['username']
   password = params['password']
 
-  # TODO: Grab user by username from database and check password
-  user = { 'username' => 'alice', 'password' => '123' }
-
+  user = PSS::Users.find_by_username username
   if password == user['password']
     headers['Content-Type'] = 'application/json'
-    # TODO: Return all pets adopted by this user
-    # TODO: Set session[:user_id] so the server will remember this user has logged in
-    $sample_user.to_json
+    session[:user_id] = user['id']
+    user[:cats] = PSS::Pets.adopted_by user['id'], kind: 'cats'
+    user[:dogs] = PSS::Pets.adopted_by user['id'], kind: 'dogs'
+    user.delete('password')
+    user.to_json
   else
     status 401
   end
 end
 
  # # # #
-# Cats #
+# Pets #
 # # # #
 get '/shops/:id/cats' do
   headers['Content-Type'] = 'application/json'
   id = params[:id]
-  # TODO: Grab from database instead
-  RestClient.get("http://pet-shop.api.mks.io/shops/#{id}/cats")
+  all_cats = PSS::Pets.find_by_shop_id(id, kind: 'cats') || []
+  all_cats.to_json
 end
 
 put '/shops/:shop_id/cats/:id/adopt' do
   headers['Content-Type'] = 'application/json'
-  shop_id = params[:shop_id]
   id = params[:id]
-  # TODO: Grab from database instead
-  RestClient.put("http://pet-shop.api.mks.io/shops/#{shop_id}/cats/#{id}",
-    { adopted: true }, :content_type => 'application/json')
-  # TODO (after you create users table): Attach new cat to logged in user
+  PSS::Pets.update_status id, @current_user['id'], kind: 'cats'
 end
 
 
  # # # #
-# Dogs #
+# Pets #
 # # # #
 get '/shops/:id/dogs' do
   headers['Content-Type'] = 'application/json'
   id = params[:id]
-  # TODO: Update database instead
-  RestClient.get("http://pet-shop.api.mks.io/shops/#{id}/dogs")
+  all_dogs = PSS::Pets.find_by_shop_id(id, kind: 'dogs') || []
+  all_dogs.to_json
 end
 
 put '/shops/:shop_id/dogs/:id/adopt' do
   headers['Content-Type'] = 'application/json'
-  shop_id = params[:shop_id]
   id = params[:id]
-  # TODO: Update database instead
-  RestClient.put("http://pet-shop.api.mks.io/shops/#{shop_id}/dogs/#{id}",
-    { adopted: true }, :content_type => 'application/json')
-  # TODO (after you create users table): Attach new dog to logged in user
+  PSS::Pets.update_status id, @current_user['id'], kind: 'dogs'
 end
-
-
-$sample_user = {
-  id: 999,
-  username: 'alice',
-  cats: [
-    { shopId: 1, name: "NaN Cat", imageUrl: "http://i.imgur.com/TOEskNX.jpg", adopted: true, id: 44 },
-    { shopId: 8, name: "Meowzer", imageUrl: "http://www.randomkittengenerator.com/images/cats/rotator.php", id: 8, adopted: "true" }
-  ],
-  dogs: [
-    { shopId: 1, name: "Leaf Pup", imageUrl: "http://i.imgur.com/kuSHji2.jpg", happiness: 2, id: 2, adopted: "true" }
-  ]
-}
